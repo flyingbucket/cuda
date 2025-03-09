@@ -1,0 +1,68 @@
+4 devices fount Device 0: NVIDIA A30
+  Compute Capability: 8.0
+  Total Global Memory: 24169 MB
+  Shared Memory per Block: 48.00 KB
+  Registers per Block: 65536
+  Warp Size: 32
+  Max Threads per Block: 1024
+  Max Grid Size: 2147483647 x 65535 x 65535
+  Max Threads per Multiprocessor: 2048
+  Number of Multiprocessors: 56
+  Memory Clock Rate: 1215.00 MHz
+  Memory Bus Width: 3072 bits
+------------------------------------
+Device 1: NVIDIA A30
+  Compute Capability: 8.0
+  Total Global Memory: 24169 MB
+  Shared Memory per Block: 48.00 KB
+  Registers per Block: 65536
+  Warp Size: 32
+  Max Threads per Block: 1024
+  Max Grid Size: 2147483647 x 65535 x 65535
+  Max Threads per Multiprocessor: 2048
+  Number of Multiprocessors: 56
+  Memory Clock Rate: 1215.00 MHz
+  Memory Bus Width: 3072 bits
+------------------------------------
+Device 2: NVIDIA A30
+  Compute Capability: 8.0
+  Total Global Memory: 24169 MB
+  Shared Memory per Block: 48.00 KB
+  Registers per Block: 65536
+  Warp Size: 32
+  Max Threads per Block: 1024
+  Max Grid Size: 2147483647 x 65535 x 65535
+  Max Threads per Multiprocessor: 2048
+  Number of Multiprocessors: 56
+  Memory Clock Rate: 1215.00 MHz
+  Memory Bus Width: 3072 bits
+------------------------------------
+Device 3: NVIDIA A30
+  Compute Capability: 8.0
+  Total Global Memory: 24169 MB
+  Shared Memory per Block: 48.00 KB
+  Registers per Block: 65536
+  Warp Size: 32
+  Max Threads per Block: 1024
+  Max Grid Size: 2147483647 x 65535 x 65535
+  Max Threads per Multiprocessor: 2048
+  Number of Multiprocessors: 56
+  Memory Clock Rate: 1215.00 MHz
+  Memory Bus Width: 3072 bits
+------------------------------------
+Student ID: 2311067, Thread ID: 0
+Student ID: 2311067, Thread ID: 1
+Student ID: 2311067, Thread ID: 2
+Student ID: 2311067, Thread ID: 3
+Student ID: 2311067, Thread ID: 4
+Student ID: 2311067, Thread ID: 5
+Student ID: 2311067, Thread ID: 6
+Student ID: 2311067, Thread ID: 7
+Student ID: 2311067, Thread ID: 8
+Student ID: 2311067, Thread ID: 9
+Student ID: 2311067, Thread ID: 10
+Student ID: 2311067, Thread ID: 11
+Student ID: 2311067, Thread ID: 12
+Student ID: 2311067, Thread ID: 13
+Student ID: 2311067, Thread ID: 14
+Student ID: 2311067, Thread ID: 15
