@@ -4,7 +4,7 @@
 
 __global__ void printInfo() {
   int threadId = threadIdx.x;
-  const char *student_id = "2311067"; // 请替换为你的实际学号
+  const char *student_id = "2311067";
 
   printf("Student ID: %s, Thread ID: %d\n", student_id, threadId);
 }
