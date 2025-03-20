@@ -1,4 +1,6 @@
+#include <cmath>
 #include <cuda_runtime.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,9 +11,15 @@ __global__ void square(int *ori, int *target, int size) {
   }
 }
 
+__global__ void d_sqrt(int *ori, double *target, int size) {
+  int idx = threadIdx.x + blockDim.x * blockIdx.x;
+  if (idx < size) {
+    target[idx] = sqrtf(ori[idx]);
+  }
+}
 int main() {
   // ptr on host
-  int size = 1e5;
+  int size = 1e8;
   int *A = (int *)malloc(size * sizeof(int));
   int *res = (int *)malloc(size * sizeof(int));
   // ptr on device
