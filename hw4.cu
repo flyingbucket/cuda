@@ -1,9 +1,12 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 
-__global__ void twice(float *devicePtr) {
+__global__ void twice(float *devicePtr, int N) {
+
   int tid = threadIdx.x + blockDim.x * blockIdx.x;
-  devicePtr[tid] *= 2;
+  if (tid < N) {
+    devicePtr[tid] *= 2.0f;
+  }
 }
 
 int main() {

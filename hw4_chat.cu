@@ -1,3 +1,4 @@
+#include <cuda_device_runtime_api.h>
 #include <cuda_runtime.h>
 #include <stdio.h>
 
@@ -28,7 +29,7 @@ int main() {
   for (size_t i = 0; i < num_floats; ++i) {
     data[i] = (float)i;
   }
-
+  cudaDeviceSynchronize();
   // Launch kernel
   int block_size = 1024;
   int grid_size = (num_floats + block_size - 1) / block_size;
