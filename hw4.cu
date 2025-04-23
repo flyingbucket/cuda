@@ -19,7 +19,8 @@ int main() {
   float *devicePtr;
 
   // destribute host memory
-  cudaHostAlloc((void **)&hostPtr, 2 * global_mem, cudaHostAllocDefault);
+  int N = 2 * global_mem / sizeof(float);
+  cudaHostAlloc((void **)&hostPtr, N * sizeof(float), cudaHostAllocDefault);
   for (int i = 0; i < 2 * global_mem / sizeof(float); i += 1) {
     hostPtr[i] = i;
   }
@@ -33,7 +34,7 @@ int main() {
   cudaHostGetDevicePointer((void **)&devicePtr, (void **)&hostPtr, 0);
 
   // call kernel "twice"
-  int grid_size = (2 * global_mem + (sizeof(float) * 1024 - 1)) / sizeof(float);
+  int grid_size = (N + 1024 - 1) / 1024;
   twice<<<grid_size, 1024>>>(devicePtr);
   cudaDeviceSynchronize();
 
