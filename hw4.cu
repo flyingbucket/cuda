@@ -1,3 +1,4 @@
+#include <cuda_device_runtime_api.h>
 #include <cuda_runtime.h>
 #include <stdio.h>
 
@@ -34,6 +35,8 @@ int main() {
   // call kernel "twice"
   int grid_size = (2 * global_mem + (sizeof(float) * 1024 - 1)) / sizeof(float);
   twice<<<grid_size, 1024>>>(devicePtr);
+  cudaDeviceSynchronize();
+
   for (int i = 0; i < 10; i += 1) {
     printf("%f ", hostPtr[i]);
   }
