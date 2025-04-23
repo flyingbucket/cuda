@@ -37,6 +37,11 @@ int main() {
   twice<<<grid_size, 1024>>>(devicePtr);
   cudaDeviceSynchronize();
 
+  cudaError_t error = cudaGetLastError();
+  if (error != cudaSuccess) {
+    printf("CUDA error: %s\n", cudaGetErrorString(error));
+  }
+
   for (int i = 0; i < 10; i += 1) {
     printf("%f ", hostPtr[i]);
   }
