@@ -1,5 +1,4 @@
 #include <cuda_runtime.h>
-#include <driver_types.h>
 #include <stdio.h>
 
 __global__ void make_arr(int *arr) {
