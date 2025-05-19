@@ -85,37 +85,39 @@ int main() {
 
   free(h_data);
 
-  // // --- 2. P2P 拷贝 ---
-  // // 开启P2P访问
-  // check(cudaSetDevice(dev0), "SetDevice 0");
-  // if (canAccessPeer01) {
-  //   cudaDeviceEnablePeerAccess(dev1, 0);
-  // }
-  // check(cudaSetDevice(dev1), "SetDevice 1");
-  // if (canAccessPeer10) {
-  //   cudaDeviceEnablePeerAccess(dev0, 0);
-  // }
-  //
-  // check(cudaSetDevice(dev0), "SetDevice 0");
-  // check(cudaEventRecord(start), "EventRecord start");
-  // // 使用cudaMemcpyPeer从GPU0到GPU1
-  // check(cudaMemcpyPeer(d_data1, dev1, d_data0, dev0, bytes),
-  //       "MemcpyPeer D0->D1");
-  // check(cudaEventRecord(stop1), "EventRecord stop1");
-  // check(cudaEventSynchronize(stop1), "EventSynchronize stop1");
-  // check(cudaEventElapsedTime(&elapsed_ms, start, stop1), "EventElapsedTime");
-  //
-  // printf("P2P memcpyPeer time: %.3f ms\n", elapsed_ms);
-  //
-  // // 关闭P2P访问
-  // check(cudaSetDevice(dev0), "SetDevice 0");
-  // if (canAccessPeer01) {
-  //   cudaDeviceDisablePeerAccess(dev1);
-  // }
-  // check(cudaSetDevice(dev1), "SetDevice 1");
-  // if (canAccessPeer10) {
-  //   cudaDeviceDisablePeerAccess(dev0);
-  // }
-  //
+  // --- 2. P2P 拷贝 ---
+  // 开启P2P访问
+  check(cudaSetDevice(dev0), "SetDevice 0");
+  if (canAccessPeer01) {
+    cudaDeviceEnablePeerAccess(dev1, 0);
+  }
+  check(cudaSetDevice(dev1), "SetDevice 1");
+  if (canAccessPeer10) {
+    cudaDeviceEnablePeerAccess(dev0, 0);
+  }
+
+  check(cudaSetDevice(dev1), "SetDevice 1 (for event creation)");
+  cudaEvent_t start, stop;
+  check(cudaEventCreate(&start), "CreateEvent start");
+  check(cudaEventCreate(&stop), "CreateEvent stop");
+
+  check(cudaEventRecord(start), "EventRecord start");
+
+  check(cudaMemcpyPeer(d_data1, dev1, d_data0, dev0, bytes),
+        "MemcpyPeer D0->D1");
+
+  check(cudaEventRecord(stop), "EventRecord stop");
+
+  check(cudaEventSynchronize(stop), "EventSynchronize stop");
+
+  float elapsed_ms_p2p = 0.0f;
+  check(cudaEventElapsedTime(&elapsed_ms_p2p, start, stop), "EventElapsedTime");
+
+  printf("P2P memcpyPeer time: %.3f ms\n", elapsed_ms_p2p);
+
+  // 7. 释放事件
+  check(cudaEventDestroy(start), "DestroyEvent start");
+  check(cudaEventDestroy(stop), "DestroyEvent stop");
+
   return 0;
 }
