@@ -45,36 +45,42 @@ int main() {
   check(cudaMalloc(&d_data1, bytes), "Malloc GPU1");
   printf("gpu1 memory prepared\n");
 
-  // 计时辅助
-  cudaEvent_t start, stop;
-  float elapsed_ms;
-
-  // 确保在创建事件前设置成同一个 GPU
-  check(cudaSetDevice(dev0), "SetDevice 0 (for event creation)");
-  check(cudaEventCreate(&start), "CreateEvent start");
-  check(cudaEventCreate(&stop), "CreateEvent stop");
-  // 计时辅助
-
   // --- 1. GPU0->CPU->GPU1 拷贝 ---
+  // 计时辅助
+  // create event on gpu0
+  cudaEvent_t start0, stop0;
+  float elapsed_ms0;
+
+  check(cudaSetDevice(dev0), "SetDevice 0 (for event creation)");
+  check(cudaEventCreate(&start0), "CreateEvent start");
+  check(cudaEventCreate(&stop0), "CreateEvent stop");
 
   // 准备Host缓冲
   float *h_data = nullptr;
   h_data = (float *)malloc(bytes);
 
   check(cudaSetDevice(dev0), "SetDevice 0");
-  check(cudaEventRecord(start), "EventRecord start");
+  check(cudaEventRecord(start0), "EventRecord start");
   // 从GPU0拷贝到Host
   check(cudaMemcpy(h_data, d_data0, bytes, cudaMemcpyDeviceToHost),
         "Memcpy D0->H");
-  // 切换到GPU1设备
-  check(cudaSetDevice(dev1), "SetDevice 1");
+  check(cudaEventRecord(stop0), "EventRecord stop0");
+  check(cudaEventSynchronize(stop0), "EventSynchronize stop");
+  check(cudaEventElapsedTime(&elapsed_ms0, start0, stop0), "EventElapsedTime");
+
+  // creat event on gpu1
+  cudaEvent_t start1, stop1;
+  float elapsed_ms1;
+
+  check(cudaEventCreate(&start1), "CreateEvent start");
+  check(cudaEventCreate(&stop1), "CreateEvent stop");
   // 从Host拷贝到GPU1
   check(cudaMemcpy(d_data1, h_data, bytes, cudaMemcpyHostToDevice),
         "Memcpy H->D1");
-  check(cudaEventRecord(stop), "EventRecord stop");
-  check(cudaEventSynchronize(stop), "EventSynchronize stop");
-  check(cudaEventElapsedTime(&elapsed_ms, start, stop), "EventElapsedTime");
-
+  check(cudaEventRecord(stop1), "EventRecord stop");
+  check(cudaEventSynchronize(stop1), "EventSynchronize stop");
+  check(cudaEventElapsedTime(&elapsed_ms1, start1, stop1), "EventElapsedTime");
+  float elapsed_ms = elapsed_ms0 + elapsed_ms1;
   printf("GPU0->CPU->GPU1 memcpy time: %.3f ms\n", elapsed_ms);
 
   free(h_data);
