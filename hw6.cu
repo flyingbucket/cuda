@@ -59,7 +59,6 @@ int main() {
   float *h_data = nullptr;
   h_data = (float *)malloc(bytes);
 
-  check(cudaSetDevice(dev0), "SetDevice 0");
   check(cudaEventRecord(start0), "EventRecord start");
   // 从GPU0拷贝到Host
   check(cudaMemcpy(h_data, d_data0, bytes, cudaMemcpyDeviceToHost),
@@ -71,9 +70,10 @@ int main() {
   // creat event on gpu1
   cudaEvent_t start1, stop1;
   float elapsed_ms1;
-
+  check(cudaSetDevice(dev1), "SetDevice 1");
   check(cudaEventCreate(&start1), "CreateEvent start");
   check(cudaEventCreate(&stop1), "CreateEvent stop");
+  check(cudaEventRecord(start1), "EventRecord start");
   // 从Host拷贝到GPU1
   check(cudaMemcpy(d_data1, h_data, bytes, cudaMemcpyHostToDevice),
         "Memcpy H->D1");
