@@ -101,9 +101,9 @@ int main() {
   // 使用cudaMemcpyPeer从GPU0到GPU1
   check(cudaMemcpyPeer(d_data1, dev1, d_data0, dev0, bytes),
         "MemcpyPeer D0->D1");
-  check(cudaEventRecord(stop), "EventRecord stop");
-  check(cudaEventSynchronize(stop), "EventSynchronize stop");
-  check(cudaEventElapsedTime(&elapsed_ms, start, stop), "EventElapsedTime");
+  check(cudaEventRecord(stop1), "EventRecord stop1");
+  check(cudaEventSynchronize(stop1), "EventSynchronize stop1");
+  check(cudaEventElapsedTime(&elapsed_ms, start, stop1), "EventElapsedTime");
 
   printf("P2P memcpyPeer time: %.3f ms\n", elapsed_ms);
 
