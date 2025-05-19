@@ -38,18 +38,22 @@ int main() {
                    cudaMemcpyHostToDevice),
         "from host copy ori_data to dev0");
   free(ori_data);
-
+  printf("gpu0 data prepared");
   // 2. 准备GPU1内存
   check(cudaSetDevice(dev1), "SetDevice 1");
   float *d_data1 = nullptr;
   check(cudaMalloc(&d_data1, bytes), "Malloc GPU1");
+  printf("gpu1 memory prepared");
 
   // 计时辅助
   cudaEvent_t start, stop;
   float elapsed_ms;
 
+  // 确保在创建事件前设置成同一个 GPU
+  check(cudaSetDevice(dev0), "SetDevice 0 (for event creation)");
   check(cudaEventCreate(&start), "CreateEvent start");
   check(cudaEventCreate(&stop), "CreateEvent stop");
+  // 计时辅助
 
   // --- 1. GPU0->CPU->GPU1 拷贝 ---
 
