@@ -11,7 +11,7 @@ __global__ void ReducSumGlobalMem(int *src, int *res, int N) {
   int tid = threadIdx.x;
   int idx = threadIdx.x + blockDim.x * blockIdx.x;
   for (int offset = blockDim.x / 2; offset > 0; offset /= 2) {
-    if (tid + offset < blockDim.x && idx + offset < N) {
+    if (tid < offset && idx + offset < N) {
       src[idx] += src[idx + offset];
     }
     __syncthreads();
