@@ -66,6 +66,11 @@ int main() {
   cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
              cudaMemcpyDeviceToHost);
   cudaMemcpy(&res, d_final_res, sizeof(int), cudaMemcpyDeviceToHost);
+  cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
+             cudaMemcpyDeviceToHost);
+  for (int i = 0; i < grid_size; i++) {
+    printf("block_res[%d] = %d\n", i, h_block_res[i]);
+  }
   for (int i = 0; i < grid_size && i < 10; i++) {
     printf("%d", h_block_res[i]);
     printf(" ");
