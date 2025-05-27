@@ -27,7 +27,7 @@ __global__ void ReducSumGlobalMem(int *src, int *res, int N) {
 __global__ void FinalSum(int *block_sum, int *res, int grid_size) {
   int tid = threadIdx.x;
   for (int offset = grid_size / 2; offset > 0; offset /= 2) {
-    if (tid + offset < grid_size) {
+    if (tid < offset) {
       block_sum[tid] += block_sum[tid + offset];
     }
     __syncthreads();
