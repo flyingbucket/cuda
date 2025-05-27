@@ -44,7 +44,7 @@ int main() {
   int *h_data; // original data
   h_data = (int *)std::malloc(N * sizeof(int));
   for (int i = 0; i < N; i++) {
-    h_data[i] = i % 10;
+    h_data[i] = 1;
   }
   int *h_block_res; // to store sum of each block on host memory
   int grid_size = N / 1024 + 1;
