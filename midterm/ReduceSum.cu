@@ -1,3 +1,4 @@
+#include <__clang_cuda_builtin_vars.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cuda_device_runtime_api.h>
@@ -9,7 +10,7 @@ __global__ void ReducSumGlobalMem(int *src, int *res, int N) {
   // basic implementation of reduction sum
   // this kernel will change the src array
   int start = blockDim.x * blockIdx.x;
-  int end = min(start + blockIdx.x, N);
+  int end = min(start + blockDim.x, N);
   int tid = threadIdx.x;
   int idx = threadIdx.x + blockDim.x * blockIdx.x;
   for (int offset = blockDim.x / 2; offset > 0; offset /= 2) {
