@@ -20,7 +20,6 @@ __global__ void ReducSumGlobalMem(int *src, int *res, int N) {
   }
   if (tid == 0) {
     res[blockIdx.x] = src[idx];
-    printf("%d ", res[blockIdx.x]);
   }
 }
 
@@ -37,9 +36,22 @@ __global__ void FinalSum(int *block_sum, int *res, int grid_size) {
   }
 }
 
+unsigned int nextPowerOfTwo(int x) {
+  x = (unsigned)x;
+  if (x == 0)
+    return 1;  // 处理0的特殊情况
+  x--;         // 处理x本身为2的幂的情况
+  x |= x >> 1; // 把高位影响低位，逐步扩散
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  x++; // 加1得到结果
+  return x;
+}
 int main() {
   // host memory
-  int N = 1e4;
+  int N = 1e8;
   int res = 0;
   int *h_data; // original data
   h_data = (int *)std::malloc(N * sizeof(int));
@@ -47,7 +59,9 @@ int main() {
     h_data[i] = 1;
   }
   int *h_block_res; // to store sum of each block on host memory
-  int grid_size = N / 1024 + 1;
+  int grid_size = (N + 1023) / 1024;
+  int final_thread_len = nextPowerOfTwo(grid_size);
+  printf("grid_size: %d\nfinal_thread_len: %d", grid_size, final_thread_len);
   h_block_res = (int *)std::malloc(sizeof(int) * grid_size);
 
   // device memory
@@ -55,26 +69,22 @@ int main() {
   cudaMalloc((void **)&d_data, sizeof(int) * N);
   cudaMemcpy(d_data, h_data, sizeof(int) * N, cudaMemcpyHostToDevice);
   int *d_block_res; // to store sum of ecah block on device
-  cudaMalloc((void **)&d_block_res, sizeof(int) * grid_size);
+  cudaMalloc((void **)&d_block_res, sizeof(int) * final_thread_len);
+  cudaMemset(d_block_res, 0, sizeof(int) * final_thread_len);
   int *d_final_res;
   cudaMalloc((void **)&d_final_res, sizeof(int));
   ReducSumGlobalMem<<<grid_size, 1024>>>(d_data, d_block_res, N);
-  FinalSum<<<1, grid_size>>>(d_block_res, d_final_res, grid_size);
+  ReducSumGlobalMem<<<1, final_thread_len>>>(d_block_res, d_final_res,
+                                             final_thread_len);
+  // FinalSum<<<1, final_thread_len>>>(d_block_res, d_final_res,
+  // final_thread_len);
   cudaDeviceSynchronize();
-  printf("\n");
 
   cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
              cudaMemcpyDeviceToHost);
   cudaMemcpy(&res, d_final_res, sizeof(int), cudaMemcpyDeviceToHost);
   cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
              cudaMemcpyDeviceToHost);
-  for (int i = 0; i < grid_size; i++) {
-    printf("block_res[%d] = %d\n", i, h_block_res[i]);
-  }
-  for (int i = 0; i < grid_size && i < 10; i++) {
-    printf("%d", h_block_res[i]);
-    printf(" ");
-  }
   printf("\n");
   printf("final sum : %d\n", res);
   return 0;
