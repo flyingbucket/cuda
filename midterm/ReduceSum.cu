@@ -23,19 +23,6 @@ __global__ void ReducSumGlobalMem(int *src, int *res, int N) {
   }
 }
 
-__global__ void FinalSum(int *block_sum, int *res, int grid_size) {
-  int tid = threadIdx.x;
-  for (int offset = grid_size / 2; offset > 0; offset /= 2) {
-    if (tid < offset) {
-      block_sum[tid] += block_sum[tid + offset];
-    }
-    __syncthreads();
-  }
-  if (tid == 0) {
-    *res = block_sum[0];
-  }
-}
-
 unsigned int nextPowerOfTwo(int x) {
   x = (unsigned)x;
   if (x == 0)
@@ -49,6 +36,7 @@ unsigned int nextPowerOfTwo(int x) {
   x++; // 加1得到结果
   return x;
 }
+
 int main() {
   // host memory
   int N = 1e8;
@@ -58,33 +46,38 @@ int main() {
   for (int i = 0; i < N; i++) {
     h_data[i] = 1;
   }
-  int *h_block_res; // to store sum of each block on host memory
-  int grid_size = (N + 1023) / 1024;
-  int final_thread_len = nextPowerOfTwo(grid_size);
-  printf("grid_size: %d\nfinal_thread_len: %d", grid_size, final_thread_len);
-  h_block_res = (int *)std::malloc(sizeof(int) * grid_size);
+  int grid_size_1 = (N + 1023) / 1024;
+
+  int full_grid_size_1 = nextPowerOfTwo(grid_size_1);
+  int grid_size_2 = (full_grid_size_1 + 1023) / 1024;
+
+  int full_grid_size_2 = nextPowerOfTwo(grid_size_2);
+  printf("grid_size_1: %d\nfull_grid_size_1: %d\n", grid_size_1,
+         full_grid_size_1);
+  printf("grid_size_2: %d\nfull_grid_size_2: %d\n", grid_size_2,
+         full_grid_size_2);
 
   // device memory
   int *d_data; // original data
   cudaMalloc((void **)&d_data, sizeof(int) * N);
   cudaMemcpy(d_data, h_data, sizeof(int) * N, cudaMemcpyHostToDevice);
-  int *d_block_res; // to store sum of ecah block on device
-  cudaMalloc((void **)&d_block_res, sizeof(int) * final_thread_len);
-  cudaMemset(d_block_res, 0, sizeof(int) * final_thread_len);
+
+  int *d_block_res_1;
+  int *d_block_res_2; // to store sum of ecah block on device
+  cudaMalloc((void **)&d_block_res_1, sizeof(int) * full_grid_size_1);
+  cudaMemset(d_block_res_1, 0, sizeof(int) * full_grid_size_1);
+  cudaMalloc((void **)&d_block_res_2, sizeof(int) * full_grid_size_2);
+  cudaMemset(d_block_res_2, 0, sizeof(int) * full_grid_size_2);
+
   int *d_final_res;
   cudaMalloc((void **)&d_final_res, sizeof(int));
-  ReducSumGlobalMem<<<grid_size, 1024>>>(d_data, d_block_res, N);
-  ReducSumGlobalMem<<<1, final_thread_len>>>(d_block_res, d_final_res,
-                                             final_thread_len);
-  // FinalSum<<<1, final_thread_len>>>(d_block_res, d_final_res,
-  // final_thread_len);
+  ReducSumGlobalMem<<<grid_size_1, 1024>>>(d_data, d_block_res_1, N);
+  ReducSumGlobalMem<<<grid_size_2, 1024>>>(d_block_res_1, d_block_res_2,
+                                           full_grid_size_1);
+  ReducSumGlobalMem<<<1, grid_size_2>>>(d_block_res_2, d_final_res,
+                                        full_grid_size_2);
   cudaDeviceSynchronize();
-
-  cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
-             cudaMemcpyDeviceToHost);
   cudaMemcpy(&res, d_final_res, sizeof(int), cudaMemcpyDeviceToHost);
-  cudaMemcpy(h_block_res, d_block_res, sizeof(int) * grid_size,
-             cudaMemcpyDeviceToHost);
   printf("\n");
   printf("final sum : %d\n", res);
   return 0;
