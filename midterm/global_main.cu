@@ -23,7 +23,7 @@ unsigned int nextPowerOfTwo(int x) {
 
 int main() {
   printf("--- global memory version ---\n");
-  printf("block size: %d", BLOCK_SIZE);
+  printf("block size: %d\n", BLOCK_SIZE);
   // host memory
   int N = 1e8;
   int res_global_mem = 0;
