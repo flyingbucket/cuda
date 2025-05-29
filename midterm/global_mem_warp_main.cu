@@ -24,7 +24,7 @@ unsigned int nextPowerOfTwo(int x) {
 int main() {
   printf("--- global memory version ---\n");
   // host memory
-  int N = 1e6;
+  int N = 1e8;
   int res_global_mem = 0;
 
   int *h_data; // original data
@@ -33,9 +33,12 @@ int main() {
     h_data[i] = 1;
   }
 
-  int grid_size = nextPowerOfTwo((N + BLOCK_SIZE - 1) / BLOCK_SIZE);
+  int grid_size = (N + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  int warp_per_block = BLOCK_SIZE / 32;
+  int num_warps = grid_size * warp_per_block;
+
   int *device_sum;
-  device_sum = (int *)malloc(sizeof(int) * grid_size);
+  device_sum = (int *)malloc(sizeof(int) * num_warps);
 
   // device memory
   int *d_data; // original data
@@ -43,7 +46,7 @@ int main() {
   cudaMemcpy(d_data, h_data, sizeof(int) * N, cudaMemcpyHostToDevice);
 
   int *d_device_sum;
-  cudaMalloc((void **)&d_device_sum, sizeof(int) * grid_size);
+  cudaMalloc((void **)&d_device_sum, sizeof(int) * num_warps);
 
   // launch kernel
   // global memory version
@@ -56,9 +59,9 @@ int main() {
 
   ReducSumWarpShfl<<<grid_size, BLOCK_SIZE>>>(d_data, d_device_sum, N);
   cudaDeviceSynchronize();
-  cudaMemcpy(device_sum, d_device_sum, sizeof(int) * grid_size,
+  cudaMemcpy(device_sum, d_device_sum, sizeof(int) * num_warps,
              cudaMemcpyDeviceToHost);
-  res_global_mem = std::accumulate(device_sum, device_sum + grid_size, 0);
+  res_global_mem = std::accumulate(device_sum, device_sum + num_warps, 0);
 
   cudaEventRecord(stop);
   cudaEventSynchronize(stop);
