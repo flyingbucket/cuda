@@ -32,12 +32,23 @@ __global__ void ReducSumWarpShfl(int *src, int *res, int N) {
   for (int offset = 16; offset > 0; offset /= 2) {
     val += __shfl_down_sync(0xffffffff, val, offset);
   }
+  extern __shared__ int warp_sum[];
 
   // 每个 warp 的第一个线程写入结果
   if (lane == 0) {
     int warpId = (threadIdx.x) / 32;
-    int blockWarpOffset = blockIdx.x * (blockDim.x / 32);
-    res[blockWarpOffset + warpId] = val;
+    warp_sum[warpId] = val;
+  }
+  __syncthreads();
+  // 对warp_sum做进一步规约
+  if (threadIdx.x < 32) {
+    int warpSum = (threadIdx.x < blockDim.x) ? warp_sum[threadIdx.x] : 0;
+    for (int offset = 16; offset > 0; offset /= 2) {
+      warpSum += __shfl_down_sync(0xffffffff, warpSum, offset);
+    }
+    if (lane == 0) {
+      res[blockIdx.x] = warpSum;
+    }
   }
 }
 
