@@ -33,7 +33,7 @@ int main() {
     h_data[i] = 1;
   }
 
-  int grid_size = (N + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  int grid_size = nextPowerOfTwo((N + BLOCK_SIZE - 1) / BLOCK_SIZE);
   int *device_sum;
   device_sum = (int *)malloc(sizeof(int) * grid_size);
 
