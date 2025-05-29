@@ -24,7 +24,7 @@ unsigned int nextPowerOfTwo(int x) {
 int main() {
   printf("--- global memory version ---\n");
   // host memory
-  int N = 1e8;
+  int N = 1e6;
   int res_global_mem = 0;
 
   int *h_data; // original data
