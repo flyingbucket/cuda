@@ -1,4 +1,5 @@
 #include "kernels.cuh"
+#include <numeric>
 #include <stdio.h>
 
 unsigned int nextPowerOfTwo(int x) {
