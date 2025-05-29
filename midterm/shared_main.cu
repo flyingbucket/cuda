@@ -63,6 +63,6 @@ int main() {
   cudaEventElapsedTime(&elapsd_time, start, stop);
 
   printf("elapsed time : %f\n", elapsd_time);
-  printf("final sum on global memory : %d\n", res_global_mem);
+  printf("result : %d\n", res_global_mem);
   return 0;
 }
