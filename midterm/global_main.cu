@@ -47,12 +47,24 @@ int main() {
 
   // launch kernel
   // global memory version
+  // start recording time
+  cudaEvent_t start, stop;
+  float elapsd_time;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start);
+
   ReducSumGlobalMem<<<grid_size, BLOCK_SIZE>>>(d_data, d_device_sum, N);
   cudaDeviceSynchronize();
   cudaMemcpy(device_sum, d_device_sum, sizeof(int) * grid_size,
              cudaMemcpyDeviceToHost);
   res_global_mem = std::accumulate(device_sum, device_sum + grid_size, 0);
-  printf("\n");
+
+  cudaEventRecord(stop);
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&elapsd_time, start, stop);
+
+  printf("elapsed time : %f\n", elapsd_time);
   printf("final sum on global memory : %d\n", res_global_mem);
   return 0;
 }
