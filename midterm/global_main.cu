@@ -58,12 +58,12 @@ int main() {
   cudaDeviceSynchronize();
   cudaMemcpy(device_sum, d_device_sum, sizeof(int) * grid_size,
              cudaMemcpyDeviceToHost);
-  res_global_mem = std::accumulate(device_sum, device_sum + grid_size, 0);
 
   cudaEventRecord(stop);
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&elapsd_time, start, stop);
 
+  res_global_mem = std::accumulate(device_sum, device_sum + grid_size, 0);
   printf("elapsed time : %f\n", elapsd_time);
   printf("final sum on global memory : %d\n", res_global_mem);
   return 0;
