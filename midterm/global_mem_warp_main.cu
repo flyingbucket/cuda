@@ -22,7 +22,7 @@ unsigned int nextPowerOfTwo(int x) {
 }
 
 int main() {
-  printf("--- global memory version ---\n");
+  printf("--- using shared memory with warp reduction ---\n");
   // host memory
   int N = 1e8;
   int res_global_mem = 0;
